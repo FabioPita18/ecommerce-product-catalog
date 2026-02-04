@@ -1,0 +1,95 @@
+# =============================================================================
+# Docker Ignore File for E-Commerce Backend
+# =============================================================================
+# Files and directories to exclude from Docker build context.
+# Reduces build time and image size.
+# =============================================================================
+
+# Virtual environment (we install fresh in Dockerfile)
+venv/
+.venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Test and coverage
+.coverage
+.pytest_cache/
+htmlcov/
+.tox/
+.nox/
+
+# IDEs and editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local environment files
+.env
+.env.local
+.env.*.local
+
+# Git
+.git/
+.gitignore
+
+# Documentation (not needed in runtime)
+*.md
+docs/
+
+# Docker files (not needed inside container)
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Static/media files (mounted as volumes in dev)
+staticfiles/
+media/
+
+# Database file (if using SQLite for testing)
+*.sqlite3
+db.sqlite3
+
+# Jupyter notebooks
+*.ipynb
+
+# Logs
+*.log
+logs/
+
+# pytest cache
+.pytest_cache/
+
+# mypy cache
+.mypy_cache/
+
+# Coverage reports
+htmlcov/
+.coverage
+coverage.xml

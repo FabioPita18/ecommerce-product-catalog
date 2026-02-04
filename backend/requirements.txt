@@ -1,0 +1,77 @@
+# =============================================================================
+# E-Commerce Product Catalog - Production Dependencies
+# =============================================================================
+# These are the core packages required to run the application in production.
+# Pin exact versions to ensure reproducible builds across all environments.
+#
+# To install: pip install -r requirements.txt
+# To upgrade:  pip install --upgrade package-name
+#              then update this file with the new version
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Django Core
+# -----------------------------------------------------------------------------
+# Django 5.0 - The web framework. Version 5.0 requires Python 3.10+
+# Docs: https://docs.djangoproject.com/en/5.0/
+Django==5.0.1
+
+# -----------------------------------------------------------------------------
+# Django REST Framework (DRF)
+# -----------------------------------------------------------------------------
+# DRF - Powerful toolkit for building Web APIs
+# Docs: https://www.django-rest-framework.org/
+djangorestframework==3.14.0
+
+# Simple JWT - JSON Web Token authentication for DRF
+# Provides access/refresh token pair authentication
+# Docs: https://django-rest-framework-simplejwt.readthedocs.io/
+djangorestframework-simplejwt==5.3.1
+
+# CORS Headers - Handle Cross-Origin Resource Sharing
+# Required for frontend (React) to communicate with backend
+# Docs: https://github.com/adamchainz/django-cors-headers
+django-cors-headers==4.3.1
+
+# Django Filter - Dynamic filtering for DRF
+# Enables ?category=1&price_min=10 style query filtering
+# Docs: https://django-filter.readthedocs.io/
+django-filter==23.5
+
+# DRF Spectacular - OpenAPI 3.0 schema generation
+# Auto-generates API documentation (Swagger/ReDoc)
+# Docs: https://drf-spectacular.readthedocs.io/
+drf-spectacular==0.27.0
+
+# -----------------------------------------------------------------------------
+# Database
+# -----------------------------------------------------------------------------
+# Psycopg2 - PostgreSQL adapter for Python
+# The -binary version includes pre-compiled binaries (easier install)
+# For production, consider psycopg2 (requires libpq-dev)
+# Docs: https://www.psycopg.org/docs/
+psycopg2-binary==2.9.9
+
+# -----------------------------------------------------------------------------
+# Image Handling
+# -----------------------------------------------------------------------------
+# Pillow - Python Imaging Library fork
+# Required for Django's ImageField
+# Docs: https://pillow.readthedocs.io/
+Pillow==10.2.0
+
+# -----------------------------------------------------------------------------
+# Configuration
+# -----------------------------------------------------------------------------
+# Python-dotenv - Load environment variables from .env file
+# Enables 12-factor app configuration
+# Docs: https://github.com/theskumar/python-dotenv
+python-dotenv==1.0.0
+
+# -----------------------------------------------------------------------------
+# Production Server
+# -----------------------------------------------------------------------------
+# Gunicorn - Production WSGI HTTP Server
+# Django's runserver is for development only
+# Docs: https://docs.gunicorn.org/
+gunicorn==21.2.0

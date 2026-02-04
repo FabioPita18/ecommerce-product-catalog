@@ -1,0 +1,90 @@
+# =============================================================================
+# E-Commerce Product Catalog - Development Dependencies
+# =============================================================================
+# These packages are only needed during development, not in production.
+# They include testing tools, linters, formatters, and type checkers.
+#
+# To install: pip install -r requirements-dev.txt
+# (This automatically installs requirements.txt via the -r directive)
+# =============================================================================
+
+# Include all production dependencies
+# The -r directive tells pip to also install from another requirements file
+-r requirements.txt
+
+# -----------------------------------------------------------------------------
+# Testing
+# -----------------------------------------------------------------------------
+# pytest - Modern testing framework (better than unittest)
+# Features: fixtures, parameterization, plugins, better assertions
+# Docs: https://docs.pytest.org/
+pytest==7.4.4
+
+# pytest-django - Django integration for pytest
+# Provides fixtures like `client`, `django_user_model`, database access
+# Docs: https://pytest-django.readthedocs.io/
+pytest-django==4.7.0
+
+# pytest-cov - Coverage reporting plugin for pytest
+# Measures which lines of code are executed during tests
+# Target: 85%+ coverage for this project
+# Docs: https://pytest-cov.readthedocs.io/
+pytest-cov==4.1.0
+
+# Factory Boy - Test fixture replacement library
+# Creates test objects cleanly without cluttering tests with setup code
+# Example: ProductFactory.create(price=10.99) instead of manual model creation
+# Docs: https://factoryboy.readthedocs.io/
+factory-boy==3.3.0
+
+# -----------------------------------------------------------------------------
+# Code Formatting
+# -----------------------------------------------------------------------------
+# Black - The uncompromising Python code formatter
+# Enforces consistent style automatically, no configuration needed
+# Run: black .
+# Docs: https://black.readthedocs.io/
+black==24.1.1
+
+# isort - Import statement sorter
+# Organizes imports into sections: stdlib, third-party, local
+# Run: isort .
+# Docs: https://pycqa.github.io/isort/
+isort==5.13.2
+
+# -----------------------------------------------------------------------------
+# Linting
+# -----------------------------------------------------------------------------
+# Flake8 - Style guide enforcement and error detection
+# Checks for PEP 8 compliance, common errors, complexity
+# Run: flake8 .
+# Docs: https://flake8.pycqa.org/
+flake8==7.0.0
+
+# -----------------------------------------------------------------------------
+# Type Checking
+# -----------------------------------------------------------------------------
+# mypy - Static type checker for Python
+# Catches type errors before runtime
+# Run: mypy .
+# Docs: https://mypy.readthedocs.io/
+mypy==1.8.0
+
+# django-stubs - Type stubs for Django
+# Enables mypy to understand Django's dynamic features
+# Docs: https://github.com/typeddjango/django-stubs
+django-stubs==4.2.7
+
+# djangorestframework-stubs - Type stubs for DRF
+# Enables mypy to understand DRF serializers, views, etc.
+# Docs: https://github.com/typeddjango/djangorestframework-stubs
+djangorestframework-stubs==3.14.5
+
+# -----------------------------------------------------------------------------
+# Development Tools
+# -----------------------------------------------------------------------------
+# IPython - Enhanced interactive Python shell
+# Better REPL with syntax highlighting, tab completion, magic commands
+# Use with: python manage.py shell (when installed, Django auto-detects it)
+# Docs: https://ipython.readthedocs.io/
+ipython==8.20.0

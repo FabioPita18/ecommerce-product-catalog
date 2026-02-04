@@ -297,3 +297,11 @@ uploads/
 *.temp
 tmp/
 temp/
+
+# ==================================
+# Claude Code
+# ==================================
+CLAUDE.md
+.claudeignore
+.claude/
+PHASE*-PROMPT.md

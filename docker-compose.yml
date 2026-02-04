@@ -1,0 +1,132 @@
+# =============================================================================
+# Docker Compose Configuration for E-Commerce Product Catalog
+# =============================================================================
+# This file defines the local development environment.
+#
+# Services:
+# - db: PostgreSQL 15 database
+# - backend: Django REST Framework API
+# - frontend: (To be added in Phase 6)
+#
+# Usage:
+#   docker-compose up -d          # Start all services in background
+#   docker-compose up -d db       # Start only database
+#   docker-compose logs -f        # Follow logs
+#   docker-compose down           # Stop all services
+#   docker-compose down -v        # Stop and remove volumes (data loss!)
+#
+# Docker Compose docs: https://docs.docker.com/compose/
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # PostgreSQL Database
+  # ---------------------------------------------------------------------------
+  # PostgreSQL 15 with Alpine Linux for smaller image size.
+  # Data is persisted in a named volume.
+  db:
+    image: postgres:15-alpine
+    container_name: ecommerce_db
+
+    # Environment variables for database initialization
+    # These create the database and user on first run
+    environment:
+      POSTGRES_DB: ecommerce_db
+      POSTGRES_USER: ecommerce_user
+      POSTGRES_PASSWORD: ecommerce_password
+
+    # Persist database data between container restarts
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    # Expose port for local tools (pgAdmin, DBeaver, etc.)
+    # Format: HOST_PORT:CONTAINER_PORT
+    # Using 5435 to avoid conflicts with other projects
+    ports:
+      - "5435:5432"
+
+    # Health check for service readiness
+    # Used by depends_on condition
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ecommerce_user -d ecommerce_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+    # Restart policy
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Django Backend
+  # ---------------------------------------------------------------------------
+  # Django REST Framework API with hot reloading for development.
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+
+    container_name: ecommerce_backend
+
+    # For development: use Django's runserver instead of Gunicorn
+    # runserver has hot reloading, better error pages
+    command: python manage.py runserver 0.0.0.0:8000
+
+    # Mount source code for hot reloading
+    # Changes in ./backend are immediately reflected in the container
+    volumes:
+      - ./backend:/app
+      # Named volume for static files (prevents permission issues)
+      - static_volume:/app/staticfiles
+      # Named volume for media files
+      - media_volume:/app/media
+
+    # Using 8002 to avoid conflicts with other projects
+    ports:
+      - "8002:8000"
+
+    # Environment variables for Django
+    # These override .env file settings
+    environment:
+      - DEBUG=True
+      - SECRET_KEY=dev-secret-key-not-for-production
+      - DATABASE_URL=postgresql://ecommerce_user:ecommerce_password@db:5432/ecommerce_db
+      - ALLOWED_HOSTS=localhost,127.0.0.1
+      - CORS_ALLOWED_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
+
+    # Wait for database to be ready before starting
+    depends_on:
+      db:
+        condition: service_healthy
+
+    # Restart on failure
+    restart: unless-stopped
+
+# =============================================================================
+# Named Volumes
+# =============================================================================
+# Named volumes persist data between container restarts.
+# Unlike bind mounts, they're managed by Docker.
+
+volumes:
+  # PostgreSQL data directory
+  # WARNING: docker-compose down -v will delete this!
+  postgres_data:
+
+  # Django static files (CSS, JS from admin, DRF, etc.)
+  static_volume:
+
+  # User-uploaded media files
+  media_volume:
+
+
+# =============================================================================
+# Networks (Optional)
+# =============================================================================
+# By default, Docker Compose creates a network for all services.
+# Services can reach each other by service name (e.g., 'db', 'backend').
+# Uncomment below to create a custom network:
+
+# networks:
+#   ecommerce_network:
+#     driver: bridge
