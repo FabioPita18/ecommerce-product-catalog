@@ -1,0 +1,242 @@
+[
+  {
+    "model": "products.product",
+    "pk": 1,
+    "fields": {
+      "name": "Wireless Bluetooth Headphones",
+      "slug": "wireless-bluetooth-headphones",
+      "description": "Premium wireless headphones with active noise cancellation, 30-hour battery life, and comfortable over-ear design. Features include touch controls, voice assistant support, and high-fidelity audio drivers for an immersive listening experience.",
+      "price": "149.99",
+      "category": 1,
+      "inventory_count": 50,
+      "is_active": true,
+      "featured": true,
+      "created_at": "2024-01-15T10:00:00Z",
+      "updated_at": "2024-01-15T10:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 2,
+    "fields": {
+      "name": "Smartphone Stand with Wireless Charger",
+      "slug": "smartphone-stand-wireless-charger",
+      "description": "Elegant aluminum smartphone stand with built-in 15W fast wireless charging. Compatible with all Qi-enabled devices. Adjustable viewing angle perfect for video calls and desk organization.",
+      "price": "49.99",
+      "category": 1,
+      "inventory_count": 100,
+      "is_active": true,
+      "featured": false,
+      "created_at": "2024-01-15T10:30:00Z",
+      "updated_at": "2024-01-15T10:30:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 3,
+    "fields": {
+      "name": "Mechanical Keyboard RGB",
+      "slug": "mechanical-keyboard-rgb",
+      "description": "Full-size mechanical keyboard with customizable RGB backlighting. Features Cherry MX Blue switches for tactile feedback, dedicated media controls, and USB passthrough. Built with an aluminum frame for durability.",
+      "price": "129.99",
+      "category": 1,
+      "inventory_count": 35,
+      "is_active": true,
+      "featured": true,
+      "created_at": "2024-01-16T09:00:00Z",
+      "updated_at": "2024-01-16T09:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 4,
+    "fields": {
+      "name": "4K Webcam with Ring Light",
+      "slug": "4k-webcam-ring-light",
+      "description": "Ultra HD 4K webcam with built-in adjustable ring light for perfect lighting in any environment. Auto-focus, noise-canceling microphone, and privacy cover included. Ideal for streaming and video conferencing.",
+      "price": "89.99",
+      "category": 1,
+      "inventory_count": 25,
+      "is_active": true,
+      "featured": false,
+      "created_at": "2024-01-16T14:00:00Z",
+      "updated_at": "2024-01-16T14:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 5,
+    "fields": {
+      "name": "Classic Denim Jacket",
+      "slug": "classic-denim-jacket",
+      "description": "Timeless medium-wash denim jacket with button closure. Features chest pockets, adjustable waist tabs, and premium 100% cotton construction. A versatile wardrobe essential that pairs with everything.",
+      "price": "79.99",
+      "category": 2,
+      "inventory_count": 45,
+      "is_active": true,
+      "featured": true,
+      "created_at": "2024-01-17T11:00:00Z",
+      "updated_at": "2024-01-17T11:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 6,
+    "fields": {
+      "name": "Cotton Crew Neck T-Shirt Pack",
+      "slug": "cotton-crew-neck-tshirt-pack",
+      "description": "Pack of 5 premium cotton crew neck t-shirts in assorted colors (black, white, gray, navy, olive). Pre-shrunk fabric, tagless design for comfort, and reinforced seams for durability.",
+      "price": "39.99",
+      "category": 2,
+      "inventory_count": 200,
+      "is_active": true,
+      "featured": false,
+      "created_at": "2024-01-17T15:00:00Z",
+      "updated_at": "2024-01-17T15:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 7,
+    "fields": {
+      "name": "Running Sneakers",
+      "slug": "running-sneakers",
+      "description": "Lightweight running shoes with responsive foam cushioning and breathable mesh upper. Features a durable rubber outsole for excellent traction and reflective details for visibility during evening runs.",
+      "price": "119.99",
+      "category": 2,
+      "inventory_count": 60,
+      "is_active": true,
+      "featured": true,
+      "created_at": "2024-01-18T09:00:00Z",
+      "updated_at": "2024-01-18T09:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 8,
+    "fields": {
+      "name": "The Art of Programming",
+      "slug": "the-art-of-programming",
+      "description": "A comprehensive guide to software development principles and best practices. Covers clean code, design patterns, testing strategies, and career advice for developers at all levels. 500+ pages with practical examples.",
+      "price": "44.99",
+      "category": 3,
+      "inventory_count": 75,
+      "is_active": true,
+      "featured": true,
+      "created_at": "2024-01-18T13:00:00Z",
+      "updated_at": "2024-01-18T13:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 9,
+    "fields": {
+      "name": "Mystery Novel Collection",
+      "slug": "mystery-novel-collection",
+      "description": "Box set of 6 bestselling mystery novels featuring detective Sarah Chen. Award-winning series that will keep you guessing until the final page. Perfect for mystery lovers and book club discussions.",
+      "price": "54.99",
+      "category": 3,
+      "inventory_count": 30,
+      "is_active": true,
+      "featured": false,
+      "created_at": "2024-01-19T10:00:00Z",
+      "updated_at": "2024-01-19T10:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 10,
+    "fields": {
+      "name": "Modern Minimalist Desk Lamp",
+      "slug": "modern-minimalist-desk-lamp",
+      "description": "Sleek LED desk lamp with adjustable brightness levels and color temperature settings. Features a USB charging port, touch controls, and a flexible gooseneck design. Energy-efficient and stylish.",
+      "price": "59.99",
+      "category": 4,
+      "inventory_count": 40,
+      "is_active": true,
+      "featured": false,
+      "created_at": "2024-01-19T14:00:00Z",
+      "updated_at": "2024-01-19T14:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 11,
+    "fields": {
+      "name": "Indoor Plant Starter Kit",
+      "slug": "indoor-plant-starter-kit",
+      "description": "Complete kit for growing indoor plants including 3 ceramic pots with drainage, premium potting soil, plant food, and seeds for herbs and succulents. Perfect for beginners and urban gardeners.",
+      "price": "34.99",
+      "category": 4,
+      "inventory_count": 55,
+      "is_active": true,
+      "featured": true,
+      "created_at": "2024-01-20T09:00:00Z",
+      "updated_at": "2024-01-20T09:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 12,
+    "fields": {
+      "name": "Cozy Throw Blanket",
+      "slug": "cozy-throw-blanket",
+      "description": "Ultra-soft microfiber throw blanket measuring 50x60 inches. Machine washable, fade-resistant, and perfect for movie nights on the couch. Available in this warm gray color.",
+      "price": "29.99",
+      "category": 4,
+      "inventory_count": 80,
+      "is_active": true,
+      "featured": false,
+      "created_at": "2024-01-20T11:00:00Z",
+      "updated_at": "2024-01-20T11:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 13,
+    "fields": {
+      "name": "Yoga Mat Premium",
+      "slug": "yoga-mat-premium",
+      "description": "Extra thick (6mm) yoga mat with alignment lines and non-slip surface on both sides. Made from eco-friendly TPE material, includes carrying strap. Perfect for yoga, pilates, and floor exercises.",
+      "price": "45.99",
+      "category": 5,
+      "inventory_count": 65,
+      "is_active": true,
+      "featured": true,
+      "created_at": "2024-01-21T08:00:00Z",
+      "updated_at": "2024-01-21T08:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 14,
+    "fields": {
+      "name": "Resistance Bands Set",
+      "slug": "resistance-bands-set",
+      "description": "Set of 5 resistance bands with different tension levels (5-50 lbs). Includes door anchor, handles, and ankle straps. Comes with exercise guide and carrying bag. Great for home workouts.",
+      "price": "24.99",
+      "category": 5,
+      "inventory_count": 90,
+      "is_active": true,
+      "featured": false,
+      "created_at": "2024-01-21T12:00:00Z",
+      "updated_at": "2024-01-21T12:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 15,
+    "fields": {
+      "name": "Insulated Water Bottle",
+      "slug": "insulated-water-bottle",
+      "description": "32oz double-wall vacuum insulated stainless steel water bottle. Keeps drinks cold for 24 hours or hot for 12 hours. Leak-proof lid with built-in straw. BPA-free and sweat-proof exterior.",
+      "price": "32.99",
+      "category": 5,
+      "inventory_count": 120,
+      "is_active": true,
+      "featured": false,
+      "created_at": "2024-01-21T16:00:00Z",
+      "updated_at": "2024-01-21T16:00:00Z"
+    }
+  }
+]
