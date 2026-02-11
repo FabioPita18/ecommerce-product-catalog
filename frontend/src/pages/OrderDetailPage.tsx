@@ -8,10 +8,11 @@
  * - List of order items with prices at time of purchase
  * - Shipping address
  * - Order timestamps (placed/updated)
- * - Cancel button for pending orders
+ * - Cancel button for pending orders with MUI confirmation dialog
  * - Loading skeleton and error states
  * - Back to orders link
  */
+import { useState } from 'react';
 import { useParams, Link as RouterLink } from 'react-router-dom';
 import {
   Container,
@@ -24,6 +25,11 @@ import {
   Divider,
   Skeleton,
   Alert,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import { useOrder, useCancelOrder } from '@/hooks/useOrders';
@@ -47,10 +53,11 @@ export function OrderDetailPage() {
   const { data: order, isLoading, error } = useOrder(Number(id));
   const cancelOrder = useCancelOrder();
   const { enqueueSnackbar } = useSnackbar();
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
 
   const handleCancel = async () => {
     if (!order) return;
-    if (!confirm('Are you sure you want to cancel this order?')) return;
+    setCancelDialogOpen(false);
 
     try {
       await cancelOrder.mutateAsync(order.id);
@@ -162,7 +169,7 @@ export function OrderDetailPage() {
                   color="error"
                   fullWidth
                   sx={{ mt: 2 }}
-                  onClick={handleCancel}
+                  onClick={() => setCancelDialogOpen(true)}
                   disabled={cancelOrder.isPending}
                 >
                   Cancel Order
@@ -176,6 +183,28 @@ export function OrderDetailPage() {
       <Button component={RouterLink} to="/orders" sx={{ mt: 3 }}>
         &larr; Back to Orders
       </Button>
+
+      {/* Cancel Confirmation Dialog */}
+      <Dialog
+        open={cancelDialogOpen}
+        onClose={() => setCancelDialogOpen(false)}
+      >
+        <DialogTitle>Cancel Order</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to cancel this order? This action cannot be
+            undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setCancelDialogOpen(false)}>
+            Keep Order
+          </Button>
+          <Button onClick={handleCancel} color="error" variant="contained">
+            Cancel Order
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 }

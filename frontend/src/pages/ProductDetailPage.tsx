@@ -23,6 +23,7 @@ import { useProduct } from '@/hooks/useProducts';
 import { useAddToCart } from '@/hooks/useCart';
 import { useAuth } from '@/hooks/useAuth';
 import { useSnackbar } from 'notistack';
+import { getProductImage } from '@/utils/productImages';
 
 export function ProductDetailPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -62,13 +63,13 @@ export function ProductDetailPage() {
       <Box sx={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
         {/* Product Image */}
         <Box
+          component="img"
+          src={getProductImage(product.slug, product.image, 600, 600)}
+          alt={product.name}
           sx={{
             width: { xs: '100%', md: 400 },
             height: 400,
-            backgroundColor: 'grey.200',
-            backgroundImage: product.image ? `url(${product.image})` : 'none',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
+            objectFit: 'cover',
             borderRadius: 2,
           }}
         />

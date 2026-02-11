@@ -23,7 +23,7 @@ Django URL docs: https://docs.djangoproject.com/en/5.0/topics/http/urls/
 
 from django.urls import path
 
-from .views import OrderDetailView, OrderListCreateView
+from .views import OrderCancelView, OrderDetailView, OrderListCreateView
 
 # App namespace for URL reversing: reverse('orders:order-list')
 app_name = "orders"
@@ -33,4 +33,6 @@ urlpatterns = [
     path("", OrderListCreateView.as_view(), name="order-list"),
     # View order details (GET)
     path("<int:pk>/", OrderDetailView.as_view(), name="order-detail"),
+    # Cancel a pending order (POST)
+    path("<int:pk>/cancel/", OrderCancelView.as_view(), name="order-cancel"),
 ]

@@ -27,6 +27,7 @@ import {
   useCallback,
 } from 'react';
 import type { ReactNode } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { authService } from '@/services/auth';
 import { clearTokens } from '@/services/api';
 import { AuthContext } from '@/contexts/authContextDef';
@@ -38,6 +39,7 @@ import type { User } from '@/types';
 // ---------------------------------------------------------------------------
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const queryClient = useQueryClient();
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -60,20 +62,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = useCallback(
     async (email: string, password: string): Promise<LoginResponse> => {
+      // Clear any cached data from a previous user session
+      queryClient.clear();
       const response = await authService.login(email, password);
       setUser(response.user);
       return response;
     },
-    []
+    [queryClient]
   );
 
   const register = useCallback(
     async (data: RegisterData): Promise<LoginResponse> => {
+      queryClient.clear();
       const response = await authService.register(data);
       setUser(response.user);
       return response;
     },
-    []
+    [queryClient]
   );
 
   const logout = useCallback(async (): Promise<void> => {
@@ -82,7 +87,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await authService.logout(storedRefresh);
     }
     setUser(null);
-  }, []);
+    // Clear all cached data so the next user doesn't see stale data
+    queryClient.clear();
+  }, [queryClient]);
 
   const refreshUser = useCallback(async (): Promise<void> => {
     const updatedUser = await authService.getProfile();

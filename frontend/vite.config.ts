@@ -27,7 +27,7 @@ export default defineConfig({
     // This avoids CORS issues since both frontend and API appear on same origin
     proxy: {
       '/api': {
-        target: 'http://localhost:8000',
+        target: 'http://localhost:8002',
         changeOrigin: true,
       },
     },

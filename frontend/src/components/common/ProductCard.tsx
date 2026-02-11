@@ -31,6 +31,7 @@ import { ShoppingCart as CartIcon } from '@mui/icons-material';
 import { useAuth } from '@/hooks/useAuth';
 import { useAddToCart } from '@/hooks/useCart';
 import { useSnackbar } from 'notistack';
+import { getProductImage } from '@/utils/productImages';
 import type { ProductListItem } from '@/types';
 
 interface ProductCardProps {
@@ -57,12 +58,10 @@ export function ProductCard({ product }: ProductCardProps) {
       <CardMedia
         component={RouterLink}
         to={`/products/${product.slug}`}
+        image={getProductImage(product.slug, product.image)}
+        title={product.name}
         sx={{
           height: 200,
-          backgroundColor: 'grey.200',
-          backgroundImage: product.image ? `url(${product.image})` : 'none',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
           display: 'block',
         }}
       />

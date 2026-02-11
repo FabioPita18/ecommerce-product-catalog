@@ -210,3 +210,55 @@ class OrderDetailView(APIView):
         order = get_object_or_404(Order, pk=pk, user=request.user)
         serializer = OrderDetailSerializer(order)
         return Response(serializer.data)
+
+
+class OrderCancelView(APIView):
+    """
+    Cancel a pending order.
+
+    POST /api/orders/{id}/cancel/
+
+    Only orders with 'pending' status can be cancelled.
+    Cancelling restores inventory for all order items.
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        summary="Cancel order",
+        description=(
+            "Cancel a pending order. Restores product inventory "
+            "for all items in the order."
+        ),
+        request=None,
+        responses={
+            200: OrderDetailSerializer,
+            400: OpenApiResponse(description="Order cannot be cancelled"),
+            404: OpenApiResponse(description="Order not found"),
+        },
+    )
+    @transaction.atomic
+    def post(self, request, pk):
+        """
+        Cancel the order and restore inventory.
+
+        Only pending orders can be cancelled. Processing/shipped/delivered
+        orders require a different workflow (returns, refunds, etc.).
+        """
+        order = get_object_or_404(Order, pk=pk, user=request.user)
+
+        if order.status != Order.Status.PENDING:
+            return Response(
+                {"detail": "Only pending orders can be cancelled."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Restore inventory for each order item
+        for item in order.items.select_related("product").all():
+            item.product.inventory_count += item.quantity
+            item.product.save(update_fields=["inventory_count"])
+
+        order.status = Order.Status.CANCELLED
+        order.save(update_fields=["status", "updated_at"])
+
+        return Response(OrderDetailSerializer(order).data)
