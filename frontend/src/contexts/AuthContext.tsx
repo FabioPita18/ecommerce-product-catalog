@@ -1,5 +1,5 @@
 /**
- * Authentication Context
+ * Authentication Context Provider
  *
  * Provides authentication state and actions to the entire app via React Context.
  * This is the single source of truth for "who is logged in".
@@ -15,11 +15,13 @@
  *   Context is simpler for this than query caching, and auth state
  *   doesn't benefit from TanStack Query's refetching/caching features.
  *
+ * Note: The context object and type are in authContextDef.ts so this file
+ * only exports components (required by react-refresh for fast refresh).
+ * The useAuth hook is in hooks/useAuth.ts for the same reason.
+ *
  * React Context docs: https://react.dev/reference/react/createContext
  */
 import {
-  createContext,
-  useContext,
   useState,
   useEffect,
   useCallback,
@@ -27,30 +29,9 @@ import {
 import type { ReactNode } from 'react';
 import { authService } from '@/services/auth';
 import { clearTokens } from '@/services/api';
-import type { User, LoginResponse, RegisterData } from '@/types';
-
-// ---------------------------------------------------------------------------
-// Context Type Definition
-// ---------------------------------------------------------------------------
-
-interface AuthContextType {
-  /** Current user, or null if not logged in */
-  user: User | null;
-  /** True while checking for existing session on app startup */
-  isLoading: boolean;
-  /** Convenience boolean - true if user is not null */
-  isAuthenticated: boolean;
-  /** Log in with email/password, returns tokens + user */
-  login: (email: string, password: string) => Promise<LoginResponse>;
-  /** Register a new account, returns tokens + user */
-  register: (data: RegisterData) => Promise<LoginResponse>;
-  /** Log out and clear all tokens */
-  logout: () => Promise<void>;
-  /** Re-fetch user profile (e.g., after profile update) */
-  refreshUser: () => Promise<void>;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+import { AuthContext } from '@/contexts/authContextDef';
+import type { LoginResponse, RegisterData } from '@/types';
+import type { User } from '@/types';
 
 // ---------------------------------------------------------------------------
 // Provider Component
@@ -108,7 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(updatedUser);
   }, []);
 
-  const value: AuthContextType = {
+  const value = {
     user,
     isLoading,
     isAuthenticated: !!user,
@@ -119,23 +100,4 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
-
-// ---------------------------------------------------------------------------
-// Hook for consuming auth context
-// ---------------------------------------------------------------------------
-
-/**
- * Hook to access auth state and actions.
- * Must be used within an AuthProvider.
- *
- * Usage:
- *   const { user, login, logout, isAuthenticated } = useAuth();
- */
-export function useAuth(): AuthContextType {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
 }

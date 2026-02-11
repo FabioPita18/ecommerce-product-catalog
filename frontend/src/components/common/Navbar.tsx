@@ -34,7 +34,7 @@ import {
   AccountCircle as AccountIcon,
   Store as StoreIcon,
 } from '@mui/icons-material';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/hooks/useAuth';
 import { useCartSummary } from '@/hooks/useCart';
 
 export function Navbar() {

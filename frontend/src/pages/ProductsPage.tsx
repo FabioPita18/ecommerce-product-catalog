@@ -48,57 +48,24 @@ import MenuItem from '@mui/material/MenuItem';
 import { FilterList as FilterIcon } from '@mui/icons-material';
 import { useProducts, useCategories } from '@/hooks/useProducts';
 import { ProductCard } from '@/components/common/ProductCard';
-import type { ProductFilters } from '@/types';
+import type { ProductFilters, Category } from '@/types';
 
-export function ProductsPage() {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [drawerOpen, setDrawerOpen] = useState(false);
+// ---------------------------------------------------------------------------
+// Filter Panel Component
+// ---------------------------------------------------------------------------
+// Extracted as a top-level component (outside ProductsPage) to avoid
+// re-creating it on every render, which would reset internal state
+// and trigger the react-hooks/static-components ESLint rule.
 
-  // Derive filter state from URL search params
-  const filters: ProductFilters = {
-    category: searchParams.get('category') || undefined,
-    search: searchParams.get('search') || undefined,
-    min_price: searchParams.get('min_price')
-      ? Number(searchParams.get('min_price'))
-      : undefined,
-    max_price: searchParams.get('max_price')
-      ? Number(searchParams.get('max_price'))
-      : undefined,
-    in_stock: searchParams.get('in_stock') === 'true' ? true : undefined,
-    ordering: searchParams.get('ordering') || undefined,
-    page: searchParams.get('page') ? Number(searchParams.get('page')) : 1,
-  };
+interface FilterContentProps {
+  filters: ProductFilters;
+  categories: Category[] | undefined;
+  isMobile: boolean;
+  updateFilter: (key: string, value: string | number | boolean | null) => void;
+}
 
-  const { data, isLoading } = useProducts(filters);
-  const { data: categories } = useCategories();
-
-  /**
-   * Update a single filter value in the URL.
-   * Resets to page 1 when any non-page filter changes.
-   */
-  const updateFilter = (
-    key: string,
-    value: string | number | boolean | null
-  ) => {
-    const newParams = new URLSearchParams(searchParams);
-    if (value === null || value === '' || value === false) {
-      newParams.delete(key);
-    } else {
-      newParams.set(key, String(value));
-    }
-    // Reset to page 1 when filters change (not when changing page itself)
-    if (key !== 'page') {
-      newParams.delete('page');
-    }
-    setSearchParams(newParams);
-  };
-
-  const totalPages = data ? Math.ceil(data.count / 12) : 0;
-
-  /** Filter panel content - reused in both sidebar and mobile drawer */
-  const FilterContent = () => (
+function FilterContent({ filters, categories, isMobile, updateFilter }: FilterContentProps) {
+  return (
     <Box sx={{ p: 2, width: isMobile ? 280 : '100%' }}>
       <Typography variant="h6" gutterBottom>
         Filters
@@ -168,6 +135,58 @@ export function ProductsPage() {
       />
     </Box>
   );
+}
+
+// ---------------------------------------------------------------------------
+// Products Page Component
+// ---------------------------------------------------------------------------
+
+export function ProductsPage() {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  // Derive filter state from URL search params
+  const filters: ProductFilters = {
+    category: searchParams.get('category') || undefined,
+    search: searchParams.get('search') || undefined,
+    min_price: searchParams.get('min_price')
+      ? Number(searchParams.get('min_price'))
+      : undefined,
+    max_price: searchParams.get('max_price')
+      ? Number(searchParams.get('max_price'))
+      : undefined,
+    in_stock: searchParams.get('in_stock') === 'true' ? true : undefined,
+    ordering: searchParams.get('ordering') || undefined,
+    page: searchParams.get('page') ? Number(searchParams.get('page')) : 1,
+  };
+
+  const { data, isLoading } = useProducts(filters);
+  const { data: categories } = useCategories();
+
+  /**
+   * Update a single filter value in the URL.
+   * Resets to page 1 when any non-page filter changes.
+   */
+  const updateFilter = (
+    key: string,
+    value: string | number | boolean | null
+  ) => {
+    const newParams = new URLSearchParams(searchParams);
+    if (value === null || value === '' || value === false) {
+      newParams.delete(key);
+    } else {
+      newParams.set(key, String(value));
+    }
+    // Reset to page 1 when filters change (not when changing page itself)
+    if (key !== 'page') {
+      newParams.delete('page');
+    }
+    setSearchParams(newParams);
+  };
+
+  const totalPages = data ? Math.ceil(data.count / 12) : 0;
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -216,7 +235,12 @@ export function ProductsPage() {
           <Grid size={{ xs: 12, md: 3 }}>
             <Card>
               <CardContent>
-                <FilterContent />
+                <FilterContent
+                  filters={filters}
+                  categories={categories}
+                  isMobile={isMobile}
+                  updateFilter={updateFilter}
+                />
               </CardContent>
             </Card>
           </Grid>
@@ -269,7 +293,12 @@ export function ProductsPage() {
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
       >
-        <FilterContent />
+        <FilterContent
+          filters={filters}
+          categories={categories}
+          isMobile={isMobile}
+          updateFilter={updateFilter}
+        />
         <Button
           variant="contained"
           sx={{ m: 2 }}

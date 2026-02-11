@@ -28,7 +28,7 @@ import {
   Box,
 } from '@mui/material';
 import { ShoppingCart as CartIcon } from '@mui/icons-material';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/hooks/useAuth';
 import { useAddToCart } from '@/hooks/useCart';
 import { useSnackbar } from 'notistack';
 import type { ProductListItem } from '@/types';

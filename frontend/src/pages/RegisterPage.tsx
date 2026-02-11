@@ -32,7 +32,7 @@ import {
   CircularProgress,
 } from '@mui/material';
 import Grid from '@mui/material/Grid';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/hooks/useAuth';
 
 /**
  * Zod schema for registration form.

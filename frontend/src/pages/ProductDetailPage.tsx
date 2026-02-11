@@ -21,7 +21,7 @@ import {
 import { ShoppingCart as CartIcon } from '@mui/icons-material';
 import { useProduct } from '@/hooks/useProducts';
 import { useAddToCart } from '@/hooks/useCart';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/hooks/useAuth';
 import { useSnackbar } from 'notistack';
 
 export function ProductDetailPage() {
