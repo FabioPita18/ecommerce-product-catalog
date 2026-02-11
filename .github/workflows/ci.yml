@@ -1,0 +1,119 @@
+# CI/CD Pipeline
+#
+# Runs on push to main/develop and on pull requests.
+# Three jobs run in sequence:
+# 1. backend-test: Python linting + Django tests with PostgreSQL
+# 2. frontend-test: TypeScript checking + Vite build
+# 3. docker-build: Build production Docker images (main branch only)
+#
+# GitHub Actions docs: https://docs.github.com/en/actions
+
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  # =========================================================================
+  # Backend Tests
+  # =========================================================================
+  backend-test:
+    runs-on: ubuntu-latest
+
+    # PostgreSQL service container for running tests
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          cd backend
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+
+      - name: Run tests
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/test_db
+          SECRET_KEY: test-secret-key-for-ci
+          DEBUG: 'False'
+        run: |
+          cd backend
+          pytest -v --cov=. --cov-report=xml
+
+  # =========================================================================
+  # Frontend Tests
+  # =========================================================================
+  frontend-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Type check
+        run: |
+          cd frontend
+          npx tsc -b
+
+      - name: Lint
+        run: |
+          cd frontend
+          npm run lint
+
+      - name: Build
+        run: |
+          cd frontend
+          npm run build
+
+  # =========================================================================
+  # Docker Build (only on main branch)
+  # =========================================================================
+  docker-build:
+    runs-on: ubuntu-latest
+    needs: [backend-test, frontend-test]
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Backend Image
+        run: |
+          docker build -t ecommerce-backend:${{ github.sha }} -f ./backend/Dockerfile.prod ./backend
+
+      - name: Build Frontend Image
+        run: |
+          docker build -t ecommerce-frontend:${{ github.sha }} -f ./frontend/Dockerfile.prod ./frontend

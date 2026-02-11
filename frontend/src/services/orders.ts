@@ -48,4 +48,16 @@ export const ordersService = {
     const response = await api.post<Order>('/orders/', data);
     return response.data;
   },
+
+  /**
+   * Cancel a pending order.
+   * POST /api/orders/{id}/cancel/
+   *
+   * Note: This endpoint may need to be added to the backend.
+   * Only pending orders can be cancelled.
+   */
+  async cancelOrder(id: number): Promise<Order> {
+    const response = await api.post<Order>(`/orders/${id}/cancel/`);
+    return response.data;
+  },
 };

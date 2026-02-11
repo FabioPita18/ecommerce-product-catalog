@@ -2,60 +2,93 @@
  * Login Page
  *
  * Allows users to log in with email and password.
- * Full form validation with react-hook-form + zod will be added in Phase 7.
+ * Uses react-hook-form for form state management and zod for validation.
  *
- * Current placeholder features:
- * - Email and password fields
- * - Submit button with loading state
- * - Link to register page
- * - Redirects to previous page after login (using router state)
+ * Features:
+ * - Client-side validation (email format, required fields)
+ * - Server-side error display (invalid credentials)
+ * - Redirect to previous page after login (using router state)
+ * - Loading spinner during submission
+ * - Link to registration page
+ *
+ * react-hook-form docs: https://react-hook-form.com/
+ * zod docs: https://zod.dev/
  */
 import { useState } from 'react';
 import { Link as RouterLink, useNavigate, useLocation } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import {
   Container,
+  Paper,
   Typography,
   TextField,
   Button,
-  Box,
-  Paper,
-  Alert,
   Link,
+  Box,
+  Alert,
+  CircularProgress,
 } from '@mui/material';
 import { useAuth } from '@/contexts/AuthContext';
+
+/**
+ * Zod schema for login form validation.
+ * Validates email format and ensures password is not empty.
+ */
+const loginSchema = z.object({
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(1, 'Password is required'),
+});
+
+type LoginFormData = z.infer<typeof loginSchema>;
 
 export function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  // Redirect target after successful login (defaults to home page)
+  const from =
+    (location.state as { from?: { pathname: string } })?.from?.pathname || '/';
 
-  // Where to redirect after login (defaults to home)
-  const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/';
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setIsSubmitting(true);
+  const onSubmit = async (data: LoginFormData) => {
+    setError(null);
+    setIsLoading(true);
 
     try {
-      await login(email, password);
+      await login(data.email, data.password);
       navigate(from, { replace: true });
-    } catch {
-      setError('Invalid email or password. Please try again.');
+    } catch (err: unknown) {
+      // Extract error message from Django REST Framework response
+      const errorMessage =
+        (err as { response?: { data?: { detail?: string } } })?.response?.data
+          ?.detail || 'Invalid email or password';
+      setError(errorMessage);
     } finally {
-      setIsSubmitting(false);
+      setIsLoading(false);
     }
   };
 
   return (
     <Container maxWidth="sm" sx={{ py: 8 }}>
-      <Paper sx={{ p: 4 }}>
-        <Typography variant="h4" component="h1" textAlign="center" gutterBottom>
+      <Paper elevation={3} sx={{ p: 4 }}>
+        <Typography
+          variant="h4"
+          component="h1"
+          textAlign="center"
+          gutterBottom
+        >
           Login
         </Typography>
 
@@ -65,40 +98,48 @@ export function LoginPage() {
           </Alert>
         )}
 
-        <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
           <TextField
+            {...register('email')}
             label="Email"
             type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
             fullWidth
+            margin="normal"
+            error={!!errors.email}
+            helperText={errors.email?.message}
+            autoComplete="email"
+            autoFocus
           />
+
           <TextField
+            {...register('password')}
             label="Password"
             type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
             fullWidth
+            margin="normal"
+            error={!!errors.password}
+            helperText={errors.password?.message}
+            autoComplete="current-password"
           />
+
           <Button
             type="submit"
+            fullWidth
             variant="contained"
             size="large"
-            disabled={isSubmitting}
-            fullWidth
+            disabled={isLoading}
+            sx={{ mt: 3, mb: 2 }}
           >
-            {isSubmitting ? 'Logging in...' : 'Login'}
+            {isLoading ? <CircularProgress size={24} /> : 'Login'}
           </Button>
-        </Box>
 
-        <Typography textAlign="center" sx={{ mt: 2 }}>
-          Don&apos;t have an account?{' '}
-          <Link component={RouterLink} to="/register">
-            Register
-          </Link>
-        </Typography>
+          <Typography textAlign="center">
+            Don&apos;t have an account?{' '}
+            <Link component={RouterLink} to="/register">
+              Register here
+            </Link>
+          </Typography>
+        </Box>
       </Paper>
     </Container>
   );

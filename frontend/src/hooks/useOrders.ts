@@ -74,3 +74,19 @@ export function useCreateOrder() {
     },
   });
 }
+
+/**
+ * Cancel a pending order.
+ * On success, refreshes both the order detail and orders list.
+ */
+export function useCancelOrder() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number) => ordersService.cancelOrder(id),
+    onSuccess: (_data, id) => {
+      queryClient.invalidateQueries({ queryKey: orderKeys.detail(id) });
+      queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
+    },
+  });
+}

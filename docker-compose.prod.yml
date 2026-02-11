@@ -1,0 +1,57 @@
+# Production Docker Compose Configuration
+#
+# Runs the full stack: PostgreSQL + Django + React/Nginx
+#
+# Usage:
+#   1. Create .env file with required variables (see .env.example)
+#   2. docker compose -f docker-compose.prod.yml up -d --build
+#   3. docker compose -f docker-compose.prod.yml exec backend python manage.py migrate
+#   4. Open http://localhost in your browser
+#
+# The frontend Nginx container serves on port 80 and proxies
+# /api requests to the backend container on port 8000.
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Django Backend (Gunicorn)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      SECRET_KEY: ${SECRET_KEY}
+      DEBUG: 'False'
+      ALLOWED_HOSTS: ${ALLOWED_HOSTS}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # React Frontend (Nginx)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

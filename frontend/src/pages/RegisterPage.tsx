@@ -1,72 +1,108 @@
 /**
- * Register Page
+ * Registration Page
  *
  * Allows new users to create an account.
- * Full form validation with react-hook-form + zod will be added in Phase 7.
+ * Uses react-hook-form for form state and zod for comprehensive validation.
  *
- * Current placeholder features:
- * - Registration form fields (name, email, password)
- * - Submit button with loading state
- * - Link to login page
- * - Auto-login after successful registration
+ * Validation rules:
+ * - Email must be valid format
+ * - First/last name required
+ * - Password: min 8 chars, must contain uppercase letter and number
+ * - Password confirmation must match
+ *
+ * On success, the user is auto-logged in (backend returns tokens)
+ * and redirected to the home page.
+ *
+ * react-hook-form docs: https://react-hook-form.com/
  */
 import { useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import {
   Container,
+  Paper,
   Typography,
   TextField,
   Button,
-  Box,
-  Paper,
-  Alert,
   Link,
+  Box,
+  Alert,
+  CircularProgress,
 } from '@mui/material';
+import Grid from '@mui/material/Grid';
 import { useAuth } from '@/contexts/AuthContext';
+
+/**
+ * Zod schema for registration form.
+ * Uses .refine() for cross-field validation (password confirmation).
+ */
+const registerSchema = z
+  .object({
+    email: z.string().email('Invalid email address'),
+    first_name: z.string().min(1, 'First name is required'),
+    last_name: z.string().min(1, 'Last name is required'),
+    password: z
+      .string()
+      .min(8, 'Password must be at least 8 characters')
+      .regex(/[A-Z]/, 'Password must contain an uppercase letter')
+      .regex(/[0-9]/, 'Password must contain a number'),
+    password_confirm: z.string(),
+  })
+  .refine((data) => data.password === data.password_confirm, {
+    message: 'Passwords do not match',
+    path: ['password_confirm'],
+  });
+
+type RegisterFormData = z.infer<typeof registerSchema>;
 
 export function RegisterPage() {
   const navigate = useNavigate();
-  const { register } = useAuth();
+  const { register: registerUser } = useAuth();
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const [formData, setFormData] = useState({
-    first_name: '',
-    last_name: '',
-    email: '',
-    password: '',
-    password_confirm: '',
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
   });
-  const [error, setError] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({ ...prev, [field]: e.target.value }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-
-    if (formData.password !== formData.password_confirm) {
-      setError('Passwords do not match.');
-      return;
-    }
-
-    setIsSubmitting(true);
+  const onSubmit = async (data: RegisterFormData) => {
+    setError(null);
+    setIsLoading(true);
 
     try {
-      await register(formData);
-      navigate('/', { replace: true });
-    } catch {
-      setError('Registration failed. Please try again.');
+      await registerUser(data);
+      navigate('/');
+    } catch (err: unknown) {
+      // DRF returns validation errors as { field: ["message"] }
+      const errorData = (
+        err as { response?: { data?: Record<string, string[]> } }
+      )?.response?.data;
+      if (errorData) {
+        const messages = Object.values(errorData).flat().join(', ');
+        setError(messages);
+      } else {
+        setError('Registration failed. Please try again.');
+      }
     } finally {
-      setIsSubmitting(false);
+      setIsLoading(false);
     }
   };
 
   return (
     <Container maxWidth="sm" sx={{ py: 8 }}>
-      <Paper sx={{ p: 4 }}>
-        <Typography variant="h4" component="h1" textAlign="center" gutterBottom>
+      <Paper elevation={3} sx={{ p: 4 }}>
+        <Typography
+          variant="h4"
+          component="h1"
+          textAlign="center"
+          gutterBottom
+        >
           Create Account
         </Typography>
 
@@ -76,64 +112,81 @@ export function RegisterPage() {
           </Alert>
         )}
 
-        <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <Box sx={{ display: 'flex', gap: 2 }}>
-            <TextField
-              label="First Name"
-              value={formData.first_name}
-              onChange={handleChange('first_name')}
-              required
-              fullWidth
-            />
-            <TextField
-              label="Last Name"
-              value={formData.last_name}
-              onChange={handleChange('last_name')}
-              required
-              fullWidth
-            />
-          </Box>
+        <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
+          {/* Name fields side by side */}
+          <Grid container spacing={2}>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
+                {...register('first_name')}
+                label="First Name"
+                fullWidth
+                error={!!errors.first_name}
+                helperText={errors.first_name?.message}
+                autoFocus
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
+                {...register('last_name')}
+                label="Last Name"
+                fullWidth
+                error={!!errors.last_name}
+                helperText={errors.last_name?.message}
+              />
+            </Grid>
+          </Grid>
+
           <TextField
+            {...register('email')}
             label="Email"
             type="email"
-            value={formData.email}
-            onChange={handleChange('email')}
-            required
             fullWidth
+            margin="normal"
+            error={!!errors.email}
+            helperText={errors.email?.message}
+            autoComplete="email"
           />
+
           <TextField
+            {...register('password')}
             label="Password"
             type="password"
-            value={formData.password}
-            onChange={handleChange('password')}
-            required
             fullWidth
+            margin="normal"
+            error={!!errors.password}
+            helperText={errors.password?.message}
+            autoComplete="new-password"
           />
+
           <TextField
+            {...register('password_confirm')}
             label="Confirm Password"
             type="password"
-            value={formData.password_confirm}
-            onChange={handleChange('password_confirm')}
-            required
             fullWidth
+            margin="normal"
+            error={!!errors.password_confirm}
+            helperText={errors.password_confirm?.message}
+            autoComplete="new-password"
           />
+
           <Button
             type="submit"
+            fullWidth
             variant="contained"
             size="large"
-            disabled={isSubmitting}
-            fullWidth
+            disabled={isLoading}
+            sx={{ mt: 3, mb: 2 }}
           >
-            {isSubmitting ? 'Creating account...' : 'Register'}
+            {isLoading ? <CircularProgress size={24} /> : 'Register'}
           </Button>
-        </Box>
 
-        <Typography textAlign="center" sx={{ mt: 2 }}>
-          Already have an account?{' '}
-          <Link component={RouterLink} to="/login">
-            Login
-          </Link>
-        </Typography>
+          <Typography textAlign="center">
+            Already have an account?{' '}
+            <Link component={RouterLink} to="/login">
+              Login here
+            </Link>
+          </Typography>
+        </Box>
       </Paper>
     </Container>
   );
