@@ -1,0 +1,25 @@
+/**
+ * Global Styles
+ *
+ * Minimal CSS reset and base styles.
+ * Most styling is handled by Material-UI's sx prop and theme system.
+ * This file only contains styles that MUI's CssBaseline doesn't cover.
+ */
+
+/* Ensure the app fills the full viewport height */
+html,
+body,
+#root {
+  height: 100%;
+}
+
+/* Smooth scrolling for anchor links */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Remove default link styling (MUI handles link styles) */
+a {
+  text-decoration: none;
+  color: inherit;
+}
