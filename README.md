@@ -334,41 +334,40 @@ ecommerce-product-catalog/
 ## Database Schema
 
 ```
-┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│   Category   │     │   Product    │     │    User     │
-├─────────────┤     ├─────────────┤     ├─────────────┤
-│ id           │◄────│ category_id  │     │ id          │
-│ name         │     │ name         │     │ email (PK)  │
-│ slug         │     │ slug         │     │ first_name  │
-│ description  │     │ description  │     │ last_name   │
-│ is_active    │     │ price        │     │ password    │
-└─────────────┘     │ image        │     └──────┬──────┘
-                    │ inventory    │            │
-                    │ is_active    │            │
-                    │ featured     │     ┌──────┴──────┐
-                    └──────┬──────┘     │    Cart      │
-                           │            ├─────────────┤
-                    ┌──────┴──────┐     │ user_id (1:1)│
-                    │  CartItem   │     └──────┬──────┘
-                    ├─────────────┤            │
-                    │ cart_id     │◄───────────┘
-                    │ product_id  │
-                    │ quantity    │
-                    └─────────────┘
+┌──────────────┐       ┌──────────────────┐       ┌────────────────┐
+│   Category   │       │     Product      │       │      User      │
+├──────────────┤       ├──────────────────┤       ├────────────────┤
+│ id           │◄──────│ category_id      │       │ id             │
+│ name         │       │ name             │       │ email (PK)     │
+│ slug         │       │ slug             │       │ first_name     │
+│ description  │       │ description      │       │ last_name      │
+│ is_active    │       │ price            │       │ password       │
+└──────────────┘       │ image            │       └───────┬────────┘
+                       │ inventory_count  │               │
+                       │ is_active        │               │
+                       │ featured         │       ┌───────┴────────┐
+                       └────────┬─────────┘       │      Cart      │
+                                │                 ├────────────────┤
+                       ┌────────┴─────────┐       │ user_id (1:1)  │
+                       │    CartItem      │       └───────┬────────┘
+                       ├──────────────────┤               │
+                       │ cart_id          │◄──────────────┘
+                       │ product_id       │
+                       │ quantity         │
+                       └──────────────────┘
 
-                    ┌─────────────┐     ┌─────────────┐
-                    │   Order      │     │  OrderItem   │
-                    ├─────────────┤     ├─────────────┤
-                    │ user_id     │     │ order_id     │
-                    │ status      │◄────│ product_id   │
-                    │ total_amount│     │ quantity     │
-                    │ shipping_   │     │ price_at_    │
-                    │   address   │     │   purchase   │
-                    │ notes       │     └─────────────┘
-                    └─────────────┘
+┌──────────────────┐       ┌──────────────────┐
+│      Order       │       │    OrderItem     │
+├──────────────────┤       ├──────────────────┤
+│ user_id          │       │ order_id         │
+│ status           │◄──────│ product_id       │
+│ total_amount     │       │ quantity         │
+│ shipping_address │       │ price_at_purchase│
+│ notes            │       └──────────────────┘
+└──────────────────┘
 
-Order Status: pending → processing → shipped → delivered
-                  └──→ cancelled
+Order Status: pending ──→ processing ──→ shipped ──→ delivered
+                 └─────→ cancelled
 ```
 
 ## CI/CD Pipeline
