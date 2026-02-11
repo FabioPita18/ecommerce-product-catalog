@@ -4,32 +4,33 @@ URL Configuration for Orders App.
 This module defines URL patterns for order-related endpoints.
 URLs are included in the main config/urls.py under the /api/orders/ prefix.
 
-URL Patterns (to be implemented in Phase 5):
-    /api/orders/                - List user's orders, create order (checkout)
-    /api/orders/{id}/           - Retrieve order details
+URL Patterns:
+    GET    /api/orders/         - List user's orders (order history)
+    POST   /api/orders/         - Create order (checkout from cart)
+    GET    /api/orders/{id}/    - View order details
 
 Design Notes:
-- All order endpoints require authentication
-- Users can only see their own orders
-- Creating an order (POST /api/orders/) triggers the checkout process:
-  1. Validates cart has items
-  2. Validates inventory is available
-  3. Creates Order and OrderItems
-  4. Decrements inventory
-  5. Clears the cart
-  6. Returns created order
+    - All order endpoints require JWT authentication
+    - Users can only access their own orders
+    - Order creation (POST) triggers the checkout process
+    - URL patterns do NOT include 'orders/' prefix because config/urls.py
+      already maps /api/orders/ to this module via include()
+    - Using simple path() instead of a router because we only have
+      two views (list+create and detail)
 
-Example:
-    from rest_framework.routers import DefaultRouter
-    from .views import OrderViewSet
-
-    router = DefaultRouter()
-    router.register('', OrderViewSet, basename='order')
-
-    urlpatterns = router.urls
+Django URL docs: https://docs.djangoproject.com/en/5.0/topics/http/urls/
 """
 
-from django.urls import path  # noqa: F401
+from django.urls import path
 
-# Placeholder - will be implemented in Phase 5
-urlpatterns = []
+from .views import OrderDetailView, OrderListCreateView
+
+# App namespace for URL reversing: reverse('orders:order-list')
+app_name = "orders"
+
+urlpatterns = [
+    # List orders (GET) and create order / checkout (POST)
+    path("", OrderListCreateView.as_view(), name="order-list"),
+    # View order details (GET)
+    path("<int:pk>/", OrderDetailView.as_view(), name="order-detail"),
+]
