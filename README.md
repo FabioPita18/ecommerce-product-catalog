@@ -2,12 +2,16 @@
 
 > Full-stack e-commerce application with product browsing, shopping cart, and order management
 
+**Live Demo:** [https://frontend-production-945d.up.railway.app](https://frontend-production-945d.up.railway.app)
+**API:** [https://backend-production-3a7af.up.railway.app/api/](https://backend-production-3a7af.up.railway.app/api/)
+
 [![Django](https://img.shields.io/badge/Django-5.0-092E20?logo=django)](https://www.djangoproject.com/)
 [![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript)](https://www.typescriptlang.org/)
 [![MUI](https://img.shields.io/badge/MUI-7-007FFF?logo=mui)](https://mui.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?logo=postgresql)](https://www.postgresql.org/)
 [![Tests](https://img.shields.io/badge/tests-83_passing-success)](.github/workflows/ci.yml)
+[![Railway](https://img.shields.io/badge/Railway-deployed-blueviolet?logo=railway)](https://frontend-production-945d.up.railway.app)
 
 ## Overview
 
@@ -380,6 +384,24 @@ The GitHub Actions workflow (`.github/workflows/ci.yml`) runs on every push to `
 
 ## Production Deployment
 
+### Railway (Live)
+
+The app is deployed on [Railway](https://railway.app/) as two separate services:
+
+| Service | URL |
+|---|---|
+| Frontend (Nginx) | [https://frontend-production-945d.up.railway.app](https://frontend-production-945d.up.railway.app) |
+| Backend API (Gunicorn) | [https://backend-production-3a7af.up.railway.app/api/](https://backend-production-3a7af.up.railway.app/api/) |
+| API Docs (Swagger) | [https://backend-production-3a7af.up.railway.app/api/docs/](https://backend-production-3a7af.up.railway.app/api/docs/) |
+
+Architecture:
+- **Frontend**: React build served by Nginx, proxies `/api` requests to backend via HTTPS
+- **Backend**: Django + Gunicorn with WhiteNoise for static files
+- **Database**: Railway-managed PostgreSQL
+- Auto-deploys on push to `main`
+
+### Docker Compose (Local)
+
 ```bash
 # Build and start all services
 docker compose -f docker-compose.prod.yml up -d --build
@@ -392,7 +414,7 @@ docker compose -f docker-compose.prod.yml exec backend python manage.py loaddata
 docker compose -f docker-compose.prod.yml exec backend python manage.py loaddata fixtures/products.json
 ```
 
-The production setup uses:
+The local production setup uses:
 - **Backend**: Gunicorn with 4 workers behind Nginx
 - **Frontend**: Vite production build served by Nginx with gzip and cache headers
 - **Nginx**: Serves static files, proxies `/api` requests to Django
