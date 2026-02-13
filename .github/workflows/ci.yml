@@ -113,7 +113,7 @@ jobs:
 
       - name: Build Backend Image
         run: |
-          docker build -t ecommerce-backend:${{ github.sha }} -f ./backend/Dockerfile ./backend
+          docker build -t ecommerce-backend:${{ github.sha }} -f ./backend/Dockerfile.prod ./backend
 
       - name: Build Frontend Image
         run: |

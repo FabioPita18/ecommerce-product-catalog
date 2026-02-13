@@ -7,8 +7,8 @@
 # The final image is tiny (~25MB) since it only contains Nginx and static HTML/JS/CSS.
 #
 # Railway-specific:
-# - Uses envsubst to inject PORT and BACKEND_URL into nginx.conf at startup
-# - Railway auto-injects PORT; BACKEND_URL must be set manually
+# - nginx:alpine has built-in envsubst support for /etc/nginx/templates/*.template
+# - Railway auto-injects PORT; BACKEND_URL and BACKEND_HOST must be set manually
 
 # Stage 1: Build the React application
 FROM node:22-alpine AS builder
@@ -30,15 +30,19 @@ FROM nginx:alpine
 # Copy the built static files
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Copy nginx config template (contains ${PORT} and ${BACKEND_URL} placeholders)
+# Copy nginx config template (contains ${PORT}, ${BACKEND_URL}, ${BACKEND_HOST} placeholders)
+# nginx:alpine auto-substitutes env vars in /etc/nginx/templates/*.template at startup
 COPY nginx.conf /etc/nginx/templates/default.conf.template
 
 # Remove the default nginx config to avoid conflicts
 RUN rm -f /etc/nginx/conf.d/default.conf
 
-EXPOSE ${PORT:-80}
+# Default values for local Docker Compose usage (Railway overrides these)
+ENV PORT=80
+ENV BACKEND_URL=http://backend:8000
+ENV BACKEND_HOST=backend
 
-# At startup, envsubst replaces ${PORT} and ${BACKEND_URL} in the template,
-# writes the result to the actual config location, then starts Nginx.
-# Only substitute our specific variables (not Nginx's own $uri, $host, etc.)
-CMD ["/bin/sh", "-c", "envsubst '${PORT} ${BACKEND_URL}' < /etc/nginx/templates/default.conf.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"]
+EXPOSE ${PORT}
+
+# nginx:alpine's default entrypoint handles envsubst automatically
+# for files in /etc/nginx/templates/ — no custom CMD needed
