@@ -98,6 +98,10 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 MIDDLEWARE = [
     # Security middleware should be first
     "django.middleware.security.SecurityMiddleware",
+    # WhiteNoise serves static files directly from Gunicorn (no Nginx needed)
+    # Must be placed right after SecurityMiddleware
+    # Docs: https://whitenoise.readthedocs.io/en/latest/
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     # CORS middleware must be before CommonMiddleware
     # Handles Cross-Origin Resource Sharing headers
     "corsheaders.middleware.CorsMiddleware",
@@ -277,6 +281,11 @@ STATIC_URL = "static/"
 
 # Directory where collectstatic will collect static files for production
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# WhiteNoise: Compress and cache static files with unique hashes
+# CompressedManifestStaticFilesStorage serves gzipped/brotli-compressed files
+# with cache-busting filenames (e.g., style.abc123.css)
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 
 # =============================================================================

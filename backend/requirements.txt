@@ -69,6 +69,14 @@ Pillow==10.2.0
 python-dotenv==1.0.0
 
 # -----------------------------------------------------------------------------
+# Static File Serving
+# -----------------------------------------------------------------------------
+# WhiteNoise - Serve static files directly from Gunicorn
+# Eliminates the need for Nginx/CDN to serve collected static files
+# Docs: https://whitenoise.readthedocs.io/
+whitenoise==6.6.0
+
+# -----------------------------------------------------------------------------
 # Production Server
 # -----------------------------------------------------------------------------
 # Gunicorn - Production WSGI HTTP Server

@@ -40,12 +40,14 @@ RUN pip install --no-cache /wheels/*
 # Copy application code
 COPY --chown=appuser:appuser . .
 
-# Collect static files for serving by reverse proxy
+# Collect static files for serving by WhiteNoise
 RUN python manage.py collectstatic --noinput 2>/dev/null || true
 
 USER appuser
 
-EXPOSE 8000
+# Railway injects PORT env var; default to 8000 for local Docker usage
+EXPOSE ${PORT:-8000}
 
-# Run with Gunicorn (4 workers = 2 * CPU cores + 1 for a 2-core server)
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "4", "config.wsgi:application"]
+# Run with Gunicorn, binding to Railway's PORT (or 8000 if not set)
+# Shell form is required for environment variable substitution
+CMD gunicorn --bind 0.0.0.0:${PORT:-8000} --workers 4 config.wsgi:application
